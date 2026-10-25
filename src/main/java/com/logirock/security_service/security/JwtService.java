@@ -24,7 +24,7 @@ public class JwtService {
     @Value("${security.jwt.issuer}")
     private String issuer;
 
-    @Value("${security.jwt.expiration-seconds:1800}")
+    @Value("${security.jwt.expiration-seconds}")
     private long expirationSeconds;
 
     public String generarToken(Usuario usuario) {
