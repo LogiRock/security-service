@@ -1,0 +1,12 @@
+services:
+  security-mysql:
+    image: mysql:8.1
+    container_name: security-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE_NAME:-security_db}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-4369}
+      MYSQL_USER: ${DB_USERNAME:-admin_logiRock}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-4369}
+    ports:
+      - "${DB_PORT:-3310}:3306"
