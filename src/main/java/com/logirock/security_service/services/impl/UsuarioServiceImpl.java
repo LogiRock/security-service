@@ -29,55 +29,84 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Value("${security.jwt.expiration-seconds:1800}")
     private long expirationSeconds;
 
-    @Override
-    public UsuarioResponse registrar(RegistroRequest request) {
-        if (usuarioRepository.existsByUsername(request.getUsername())) {
-            throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "El nombre de usuario ya existe"
-            );
-        }
+    // @Override
+    // public UsuarioResponse registrar(RegistroRequest request) {
+    //     if (usuarioRepository.existsByUsername(request.getUsername())) {
+    //         throw new ResponseStatusException(
+    //                 HttpStatus.CONFLICT,
+    //                 "El nombre de usuario ya existe");
+    //     }
 
-        Usuario usuario = Usuario.builder()
-            .username(request.getUsername())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .rol(Rol.CLIENTE)
-            .build();
+    //     Usuario usuario = Usuario.builder()
+    //             .username(request.getUsername())
+    //             .password(passwordEncoder.encode(request.getPassword()))
+    //             .rol(Rol.CLIENTE)
+    //             .build();
 
-        Usuario guardado = usuarioRepository.save(usuario);
+    //     Usuario guardado = usuarioRepository.save(usuario);
 
-        return new UsuarioResponse(
-            guardado.getId(),
-            guardado.getUsername(),
-            guardado.getRol()
-        );
-    }
+    //     return new UsuarioResponse(
+    //             guardado.getId(),
+    //             guardado.getUsername(),
+    //             guardado.getRol());
+    // }
 
     @Override
     public AuthResponse login(LoginRequest request) {
         Usuario usuario = usuarioRepository
-            .findByUsername(request.username())
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Credenciales incorrectas"
-            ));
+                .findByUsername(request.username())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Credenciales incorrectas"));
 
         if (!passwordEncoder.matches(
                 request.password(),
                 usuario.getPassword())) {
 
             throw new ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Credenciales incorrectas"
-            );
+                    HttpStatus.UNAUTHORIZED,
+                    "Credenciales incorrectas");
         }
 
         String token = jwtService.generarToken(usuario);
 
         return new AuthResponse(
-            token,
-            "Bearer",
-            expirationSeconds
-        );
+                token,
+                "Bearer",
+                expirationSeconds);
+    }
+
+    @Override
+    public UsuarioResponse registrar(RegistroRequest request) {
+        return registrarConRol(request, Rol.CLIENTE);
+    }
+
+    @Override
+    public UsuarioResponse registrarRepartidor(RegistroRequest request) {
+        return registrarConRol(request, Rol.REPARTIDOR);
+    }
+
+    private UsuarioResponse registrarConRol(
+            RegistroRequest request,
+            Rol rol) {
+
+        if (usuarioRepository.existsByUsername(request.getUsername())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El nombre de usuario ya existe");
+        }
+
+        Usuario usuario = Usuario.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .rol(rol)
+                .build();
+
+        Usuario guardado = usuarioRepository.save(usuario);
+
+        return new UsuarioResponse(
+                guardado.getId(),
+                guardado.getUsername(),
+                guardado.getRol());
     }
 }

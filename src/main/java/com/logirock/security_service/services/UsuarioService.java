@@ -11,4 +11,6 @@ public interface UsuarioService {
     UsuarioResponse registrar(RegistroRequest request);
 
     AuthResponse login(LoginRequest request);
+
+    UsuarioResponse registrarRepartidor(RegistroRequest request);
 }

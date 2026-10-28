@@ -1,16 +1,21 @@
 package com.logirock.security_service.controllers;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.UUID;
 
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.logirock.security_service.dto.AuthResponse;
 import com.logirock.security_service.dto.LoginRequest;
@@ -28,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final UsuarioService usuarioService;
-
+    
     @PostMapping("/register")
     public ResponseEntity<UsuarioResponse> registrar(
             @Valid @RequestBody RegistroRequest request) {
@@ -36,6 +41,15 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(usuarioService.registrar(request));
+    }
+
+    @PostMapping("/register/repartidor")
+    public ResponseEntity<UsuarioResponse> registrarRepartidor(
+            @Valid @RequestBody RegistroRequest request) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(usuarioService.registrarRepartidor(request));
     }
 
     @PostMapping("/login")
