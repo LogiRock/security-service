@@ -1,5 +1,7 @@
 package com.logirock.security_service.services.impl;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,29 +28,29 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    @Value("${security.jwt.expiration-seconds:1800}")
+    @Value("${security.jwt.expiration-seconds}")
     private long expirationSeconds;
 
     // @Override
     // public UsuarioResponse registrar(RegistroRequest request) {
-    //     if (usuarioRepository.existsByUsername(request.getUsername())) {
-    //         throw new ResponseStatusException(
-    //                 HttpStatus.CONFLICT,
-    //                 "El nombre de usuario ya existe");
-    //     }
+    // if (usuarioRepository.existsByUsername(request.getUsername())) {
+    // throw new ResponseStatusException(
+    // HttpStatus.CONFLICT,
+    // "El nombre de usuario ya existe");
+    // }
 
-    //     Usuario usuario = Usuario.builder()
-    //             .username(request.getUsername())
-    //             .password(passwordEncoder.encode(request.getPassword()))
-    //             .rol(Rol.CLIENTE)
-    //             .build();
+    // Usuario usuario = Usuario.builder()
+    // .username(request.getUsername())
+    // .password(passwordEncoder.encode(request.getPassword()))
+    // .rol(Rol.CLIENTE)
+    // .build();
 
-    //     Usuario guardado = usuarioRepository.save(usuario);
+    // Usuario guardado = usuarioRepository.save(usuario);
 
-    //     return new UsuarioResponse(
-    //             guardado.getId(),
-    //             guardado.getUsername(),
-    //             guardado.getRol());
+    // return new UsuarioResponse(
+    // guardado.getId(),
+    // guardado.getUsername(),
+    // guardado.getRol());
     // }
 
     @Override
@@ -108,5 +110,19 @@ public class UsuarioServiceImpl implements UsuarioService {
                 guardado.getId(),
                 guardado.getUsername(),
                 guardado.getRol());
+    }
+
+    @Override
+    public UsuarioResponse buscarPorId(UUID id) {
+        // TODO Auto-generated method stub
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuario no encontrado"));
+
+        return new UsuarioResponse(
+                usuario.getId(),
+                usuario.getUsername(),
+                usuario.getRol());
     }
 }

@@ -32,45 +32,42 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UsuarioService usuarioService;
-    
-    @PostMapping("/register")
-    public ResponseEntity<UsuarioResponse> registrar(
-            @Valid @RequestBody RegistroRequest request) {
+        private final UsuarioService usuarioService;
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(usuarioService.registrar(request));
-    }
+        @PostMapping("/register")
+        public ResponseEntity<UsuarioResponse> registrar(
+                        @Valid @RequestBody RegistroRequest request) {
 
-    @PostMapping("/register/repartidor")
-    public ResponseEntity<UsuarioResponse> registrarRepartidor(
-            @Valid @RequestBody RegistroRequest request) {
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(usuarioService.registrar(request));
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(usuarioService.registrarRepartidor(request));
-    }
+        @PostMapping("/register/repartidor")
+        public ResponseEntity<UsuarioResponse> registrarRepartidor(
+                        @Valid @RequestBody RegistroRequest request) {
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(
-            @Valid @RequestBody LoginRequest request) {
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(usuarioService.registrarRepartidor(request));
+        }
 
-        return ResponseEntity.ok(usuarioService.login(request));
-    }
+        @PostMapping("/login")
+        public ResponseEntity<AuthResponse> login(
+                        @Valid @RequestBody LoginRequest request) {
 
-    @GetMapping("/me")
-    public ResponseEntity<UsuarioResponse> usuarioActual(
-            @AuthenticationPrincipal Jwt jwt) {
+                return ResponseEntity.ok(usuarioService.login(request));
+        }
 
-        UsuarioResponse response = new UsuarioResponse(
-                UUID.fromString(jwt.getClaimAsString("userId")),
-                jwt.getSubject(),
-                Rol.valueOf(
-                        jwt.getClaimAsStringList("roles")
-                                .get(0)
-                                .replace("ROLE_", "")));
+        @GetMapping("/me")
+        public ResponseEntity<UsuarioResponse> usuarioActual(
+                        @AuthenticationPrincipal Jwt jwt) {
 
-        return ResponseEntity.ok(response);
-    }
+                UUID userId = UUID.fromString(
+                                jwt.getClaimAsString("userId"));
+
+                UsuarioResponse response = usuarioService.buscarPorId(userId);
+
+                return ResponseEntity.ok(response);
+        }
 }

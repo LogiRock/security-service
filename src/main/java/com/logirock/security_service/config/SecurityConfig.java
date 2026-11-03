@@ -14,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.logirock.security_service.security.CustomAccessDeniedHandler;
+import com.logirock.security_service.security.CustomAuthenticationEntryPoint;
+
 @Configuration
 public class SecurityConfig {
 
@@ -24,14 +27,12 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter authoritiesConverter =
-            new JwtGrantedAuthoritiesConverter();
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
         authoritiesConverter.setAuthoritiesClaimName("roles");
         authoritiesConverter.setAuthorityPrefix("");
 
-        JwtAuthenticationConverter converter =
-            new JwtAuthenticationConverter();
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
         converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
 
@@ -41,28 +42,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            @Qualifier("jwtAuthenticationConverter") JwtAuthenticationConverter jwtConverter) throws Exception {
+            @Qualifier("jwtAuthenticationConverter") JwtAuthenticationConverter jwtConverter,
+            CustomAuthenticationEntryPoint authenticationEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
 
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
-            )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/auth/register",
-                    "/api/auth/register/repartidor",
-                    "/api/auth/login"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )   
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .jwtAuthenticationConverter(jwtConverter)
-                )
-            );
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login")
+                        .permitAll()
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/register/repartidor")
+                        .hasAuthority("ROLE_ADMIN")
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(jwtConverter)));
 
         return http.build();
     }

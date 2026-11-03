@@ -5,8 +5,8 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE_NAME:-security_db}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-4369}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_USER: ${DB_USERNAME:-admin_logiRock}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-4369}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${DB_PORT:-3310}:3306"

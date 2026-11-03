@@ -1,6 +1,8 @@
 
 package com.logirock.security_service.services;
 
+import java.util.UUID;
+
 import com.logirock.security_service.dto.AuthResponse;
 import com.logirock.security_service.dto.LoginRequest;
 import com.logirock.security_service.dto.RegistroRequest;
@@ -13,4 +15,6 @@ public interface UsuarioService {
     AuthResponse login(LoginRequest request);
 
     UsuarioResponse registrarRepartidor(RegistroRequest request);
+
+    UsuarioResponse buscarPorId(UUID id);
 }

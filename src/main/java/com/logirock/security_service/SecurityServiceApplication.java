@@ -34,8 +34,6 @@ public class SecurityServiceApplication {
 						.build();
 
 				usuarioRepository.save(admin);
-
-				System.out.println("Administrador inicial creado.");
 			}
 		};
 	}
